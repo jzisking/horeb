@@ -1,6 +1,8 @@
 use chrono::{DateTime, Utc};
 use eframe::egui;
 use eframe::glow::Context;
+use egui::scroll_area::ScrollBarVisibility;
+use egui::ScrollArea;
 use serde::{Deserialize, Serialize};
 use std::fs;
 
@@ -79,12 +81,17 @@ impl eframe::App for HorebApp {
 
             let mut requested_date_update = None;
 
-            for (idx, note) in self.notes.iter().enumerate() {
-                if ui.button(&note.title).clicked() {
-                    requested_date_update = self.selected_index;
-                    self.selected_index = Some(idx);
-                }
-            }
+            ScrollArea::vertical()
+                .scroll_bar_visibility(ScrollBarVisibility::AlwaysVisible)
+                .auto_shrink([false, false])
+                .show(ui, |ui| {
+                    for (idx, note) in self.notes.iter().enumerate() {
+                        if ui.button(&note.title).clicked() {
+                            requested_date_update = self.selected_index;
+                            self.selected_index = Some(idx);
+                        }
+                    }
+                });
 
             if let Some(requested) = requested_date_update {
                 self.notes[requested].last_modified = Utc::now();
